@@ -17,6 +17,7 @@ dig_sound = pygame.mixer.Sound("Digging Sound.mp3")
 flag_sound = pygame.mixer.Sound("Flag put down.mp3")
 bomb_sound = pygame.mixer.Sound("Explosion.mp3")
 correct_dig_sound = pygame.mixer.Sound("Correct Dig.mp3")
+win_sound = pygame.mixer.Sound("You win.mp3")
 
 
 def resize_image(img, new_height):
@@ -211,6 +212,7 @@ while running:
         print("YOU WIN!")
         running = False
         game_won = True
+        win_sound.play()
     screen.fill((255, 255, 255))
     screen.blit(background, (0, 0))
     for i in range(rows):
@@ -289,7 +291,6 @@ if game_over:
     death_font = pygame.font.Font(None, 72)
     small_font = pygame.font.Font(None, 36)
 
-    pygame.mixer.Sound("Explosion.mp3")
 
     while death_running:
         screen.fill((0, 0, 0))
