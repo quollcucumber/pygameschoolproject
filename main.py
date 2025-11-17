@@ -13,6 +13,10 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 font = pygame.font.Font(None, 36)
 
 clock = pygame.time.Clock()
+dig_sound = pygame.mixer.Sound("Digging Sound.mp3")
+flag_sound = pygame.mixer.Sound("Flag put down.mp3")
+bomb_sound = pygame.mixer.Sound("Explosion.mp3")
+correct_dig_sound = pygame.mixer.Sound("Correct Dig.mp3")
 
 
 def resize_image(img, new_height):
@@ -45,6 +49,8 @@ def resize_image(img, new_height):
 
 
 running = True
+game_over = False
+game_won = False
 background = pygame.image.load("Minesweeper Mine.jpg")
 background = resize_image(background, 650)
 while running:
@@ -54,7 +60,6 @@ while running:
     screen.blit(text, (100, 150))
     dificultytext = font.render("Choose dificulty", True, (255, 255, 255))
     screen.blit(dificultytext, (330, 10))
-    # TODO Hadrien make better easy medium hard images
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -205,6 +210,7 @@ while running:
     if youwin() == 1:
         print("YOU WIN!")
         running = False
+        game_won = True
     screen.fill((255, 255, 255))
     screen.blit(background, (0, 0))
     for i in range(rows):
@@ -257,12 +263,18 @@ while running:
                 if 0 <= row < rows and 0 <= col < cols:
                     q.append((row, col))
                     bfs()
+                    dig_sound.play()
                     if find(row, col) == 10:
+                        bomb_sound.play()
                         print("YOU DIED")
                         running = False
+                        game_over = True
+                    else:
+                        correct_dig_sound.play()
 
             elif event.button == 3:
                 #right click, add/remove a flag
+                flag_sound.play()
                 pos = pygame.mouse.get_pos()
                 row = int((pos[1] - 100) / int(400 / cols))
                 col = int((pos[0] - 300) / int(400 / rows))
@@ -272,6 +284,53 @@ while running:
     clock.tick(60)
     # running = False
 
-pygame.quit()
+if game_over:
+    death_running = True
+    death_font = pygame.font.Font(None, 72)
+    small_font = pygame.font.Font(None, 36)
 
+    pygame.mixer.Sound("Explosion.mp3")
+
+    while death_running:
+        screen.fill((0, 0, 0))
+
+        title = death_font.render("YOU DIED", True, (255, 0, 0))
+        msg = small_font.render("Click anywhere to exit", True, (255, 255, 255))
+
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 2 - 80))
+        screen.blit(msg, (WIDTH // 2 - msg.get_width() // 2, HEIGHT // 2 + 10))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                death_running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                death_running = False
+
+        pygame.display.flip()
+        clock.tick(60)
+
+if game_won:
+    win_running = True
+    win_font = pygame.font.Font(None, 72)
+    small_font = pygame.font.Font(None, 36)
+
+    while win_running:
+        screen.fill((0, 0, 0))
+
+        title = win_font.render("YOU WIN!", True, (0, 255, 0))
+        msg = small_font.render("Click anywhere to exit", True, (255, 255, 255))
+
+        screen.blit(title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 2 - 80))
+        screen.blit(msg, (WIDTH // 2 - msg.get_width() // 2, HEIGHT // 2 + 10))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                win_running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                win_running = False
+
+        pygame.display.flip()
+        clock.tick(60)
+
+pygame.quit()
 sys.exit()
