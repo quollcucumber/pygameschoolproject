@@ -4,23 +4,55 @@ import random
 
 pygame.init()
 
+pygame.display.set_caption("Minesweeper")
 dif = 0
 
-WIDTH, HEIGHT = 1000, 650
+WIDTH, HEIGHT = 900, 650
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 # takes font from no file, of size 36
 font = pygame.font.Font(None, 36)
 
 clock = pygame.time.Clock()
 
+
+def resize_image(img, new_height):
+    """
+    This function makes an image taller or shorter while keeping its shape.
+
+    Steps:
+    1. Get the original width and height of the image.
+    2. Work out the aspect ratio (how wide vs how tall it is).
+    3. Use the new height to calculate the new width, so the image is not squashed.
+    4. Use pygame.transform.scale to resize the image.
+    5. Return (give back) the resized image.
+    """
+
+    # Get the original height and width of the image
+    original_height = img.get_height()
+    original_width = img.get_width()
+
+    # Work out how wide the image is compared to its height
+    aspect_ratio = original_width / original_height
+
+    # Calculate the new width so the image keeps the same proportions
+    new_width = int(new_height * aspect_ratio)
+
+    # Scale (resize) the image to the new width and height
+    img = pygame.transform.scale(img, (new_width, new_height))
+
+    # Give back the resized image so the rest of the program can use it
+    return img
+
+
 running = True
-easymediumhard = pygame.image.load("easymediumhard.png")
+background = pygame.image.load("Minesweeper Mine.jpg")
+background = resize_image(background, 650)
 while running:
     screen.fill((255, 255, 255))
-    screen.blit(easymediumhard, (0, 0))
-    dificultytext = font.render("Choose dificulty", True, (0, 0, 0))
+    screen.blit(background, (0, 0))
+    dificultytext = font.render("Choose dificulty", True, (255, 255, 255))
     screen.blit(dificultytext, (330, 10))
-    #TODO Hadrien make better easy medium hard images
+    # TODO Hadrien make better easy medium hard images
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -102,22 +134,60 @@ for row in range(rows):
                 total += 1
             edit(row, col, total)
         a.append(find(row, col))
-    print(a)                
+    print(a)
+
+
+tile = pygame.image.load("Minesweeper Tile.jpg")
+tile_height = 400 / rows
+tile = resize_image(tile, tile_height)
+flagtile = pygame.image.load("Minesweeper Flag.png")
+flagtile = resize_image(flagtile, tile_height)
+neighbor1 = pygame.image.load("Minesweeper 1.png")
+neighbor1 = resize_image(neighbor1, tile_height)
+neighbor2 = pygame.image.load("Minesweeper 1.png")
+neighbor2 = resize_image(neighbor2, tile_height)
+neighbor3 = pygame.image.load("Minesweeper 1.png")
+neighbor3 = resize_image(neighbor3, tile_height)
+neighbor4 = pygame.image.load("Minesweeper 1.png")
+neighbor4 = resize_image(neighbor4, tile_height)
+flags = []
+for i in range(rows):
+    a = []
+    for j in range(cols):
+        a.append(0)
+    flags.append(a)
 
 while running:
     screen.fill((255, 255, 255))
+    screen.blit(background, (0, 0))
+    for i in range(rows):
+        for j in range(cols):
+            if(flags[i][j] == 0):
+                screen.blit(tile, (300 + i * 400 / rows, 100 + j * 400 / cols))
+            else:
+                screen.blit(flagtile, (300 + i * 400 / rows, 100 + j * 400 / cols))
     if (dif == 1):
-        dificultytext = font.render("EASY", True, (0, 0, 0))
+        dificultytext = font.render("EASY", True, (255, 255, 255))
     elif (dif == 2):
-        dificultytext = font.render("MEDIUM", True, (0, 0, 0))
+        dificultytext = font.render("MEDIUM", True, (255, 255, 255))
     else:
-        dificultytext = font.render("HARD", True, (0, 0, 0))
+        dificultytext = font.render("HARD", True, (255, 255, 255))
     screen.blit(dificultytext, (470, 10))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if (event.type == pygame.MOUSEBUTTONDOWN):
-            running = False
+            if(event.button == 1):
+                #left click, click a grid to open
+                # running = False;
+                b = 0
+            elif(event.button == 3):
+                #right click, add/remove a flag
+                pos = pygame.mouse.get_pos()
+                col = int((pos[1] - 100) /int ( 400 / cols))
+                row = int((pos[0] - 300) / int(400 / rows))
+                flags[row][col] = 1 - flags[row][col]
+                print("right")
     pygame.display.flip()
     clock.tick(60)
 
