@@ -117,7 +117,6 @@ def edit(row, col, setval):
 # for i in range(rows * colums):
 #     print(grid[i])
 for row in range(rows):
-    a = []
     for col in range(cols):
         if find(row, col) != 10:
             total = 0
@@ -138,8 +137,7 @@ for row in range(rows):
             if find(row - 1, col - 1) == 10:
                 total += 1
             edit(row, col, total)
-        a.append(find(row, col))
-    print(a)
+
 
 tile = pygame.image.load("Minesweeper Tile.jpg")
 tile_height = 400 / rows + 1
@@ -172,7 +170,11 @@ for i in range(rows):
     for j in range(cols):
         a.append(0)
     opened.append(a)
-
+for i in range(rows):
+    a = []
+    for j in range(cols):
+        a.append(0)
+    flags.append(a)
 
 def bfs():
     while len(q) != 0:
@@ -191,14 +193,18 @@ def bfs():
                     q.append((row - 1, col))
                     q.append((row - 1, col - 1))
 
+def youwin():
+    for i in range(rows):
+        for j in range(cols):
+            if not (opened[i][j] == 1 or (flags[i][j] == 1 and find(i, j) == 10)):
+                return 0
+    return 1
 
-for i in range(rows):
-    a = []
-    for j in range(cols):
-        a.append(0)
-    flags.append(a)
 
 while running:
+    if youwin() == 1:
+        print("YOU WIN!")
+        running = False
     screen.fill((255, 255, 255))
     screen.blit(background, (0, 0))
     for i in range(rows):
@@ -251,7 +257,6 @@ while running:
                 if 0 <= row < rows and 0 <= col < cols:
                     q.append((row, col))
                     bfs()
-                    print(row, col)
                     if find(row, col) == 10:
                         print("YOU DIED")
                         running = False
@@ -263,7 +268,6 @@ while running:
                 col = int((pos[0] - 300) / int(400 / rows))
                 if 0 <= row < rows and 0 <= col < cols:
                     flags[row][col] = 1 - flags[row][col]
-                print("right")
     pygame.display.flip()
     clock.tick(60)
     # running = False
