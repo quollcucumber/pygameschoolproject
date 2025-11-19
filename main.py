@@ -13,11 +13,11 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 font = pygame.font.Font(None, 36)
 
 clock = pygame.time.Clock()
-# dig_sound = pygame.mixer.Sound("Digging Sound.mp3")
-# flag_sound = pygame.mixer.Sound("Flag put down.mp3")
-# bomb_sound = pygame.mixer.Sound("Explosion.mp3")
-# correct_dig_sound = pygame.mixer.Sound("Correct Dig.mp3")
-# win_sound = pygame.mixer.Sound("You win.mp3")
+dig_sound = pygame.mixer.Sound("Digging Sound.mp3")
+flag_sound = pygame.mixer.Sound("Flag put down.mp3")
+bomb_sound = pygame.mixer.Sound("Explosion.mp3")
+correct_dig_sound = pygame.mixer.Sound("Correct Dig.mp3")
+win_sound = pygame.mixer.Sound("You win.mp3")
 
 
 def resize_image(img, new_height):
@@ -220,7 +220,7 @@ while running:
         print("YOU WIN!")
         running = False
         game_won = True
-        # win_sound.play()
+        win_sound.play()
     screen.fill((255, 255, 255))
     screen.blit(background, (0, 0))
     for i in range(rows):
@@ -273,18 +273,18 @@ while running:
                 if 0 <= row < rows and 0 <= col < cols:
                     q.append((row, col))
                     bfs()
-                    # dig_sound.play()
+                    dig_sound.play()
                     if find(row, col) == 10:
-                        # bomb_sound.play()
+                        bomb_sound.play()
                         print("YOU DIED")
                         running = False
                         game_over = True
-                    # else:
-                        # correct_dig_sound.play()
+                    else:
+                        correct_dig_sound.play()
 
             elif event.button == 3:
                 #right click, add/remove a flag
-                # flag_sound.play()
+                flag_sound.play()
                 pos = pygame.mouse.get_pos()
                 row = int((pos[1] - 100) / int(400 / cols))
                 col = int((pos[0] - 300) / int(400 / rows))
